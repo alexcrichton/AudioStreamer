@@ -161,7 +161,7 @@
 //
 - (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)finished
 {
-	if (finished)
+	if (finished && [streamer isWaiting])
 	{
 		[self spinButton];
 	}
