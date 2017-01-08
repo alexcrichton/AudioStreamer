@@ -27,7 +27,6 @@
 		97B9D03E158AD5880085BC63 /* MacStreamingPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 97B9D037158AD53B0085BC63 /* MacStreamingPlayerController.m */; };
 		97B9D044158AD63D0085BC63 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 97B9D042158AD6300085BC63 /* main.m */; };
 		97B9D048158AD69A0085BC63 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97B9D047158AD69A0085BC63 /* Quartz.framework */; };
-		97B9D04F158AD6DD0085BC63 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 97B9D04B158AD6DD0085BC63 /* InfoPlist.strings */; };
 		97B9D050158AD6DD0085BC63 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 97B9D04D158AD6DD0085BC63 /* MainMenu.xib */; };
 		97B9D055158AD7470085BC63 /* loadingbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 97B9D051158AD7470085BC63 /* loadingbutton.png */; };
 		97B9D056158AD7470085BC63 /* pausebutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 97B9D052158AD7470085BC63 /* pausebutton.png */; };
@@ -117,7 +116,6 @@
 		97B9D037158AD53B0085BC63 /* MacStreamingPlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacStreamingPlayerController.m; sourceTree = "<group>"; usesTabs = 1; };
 		97B9D042158AD6300085BC63 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; usesTabs = 0; };
 		97B9D047158AD69A0085BC63 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
-		97B9D04C158AD6DD0085BC63 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		97B9D04E158AD6DD0085BC63 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		97B9D051158AD7470085BC63 /* loadingbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = loadingbutton.png; sourceTree = "<group>"; };
 		97B9D052158AD7470085BC63 /* pausebutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pausebutton.png; sourceTree = "<group>"; };
@@ -269,7 +267,6 @@
 			isa = PBXGroup;
 			children = (
 				97B9D05B158AD7D40085BC63 /* MacInfo.plist */,
-				97B9D04B158AD6DD0085BC63 /* InfoPlist.strings */,
 				97B9D04D158AD6DD0085BC63 /* MainMenu.xib */,
 			);
 			path = Mac;
@@ -423,7 +420,6 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				English,
 			);
 			mainGroup = 973BB662158AD07000A7D459;
 			productRefGroup = 97B9CFE2158AD09B0085BC63 /* Products */;
@@ -450,7 +446,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97B9D04F158AD6DD0085BC63 /* InfoPlist.strings in Resources */,
 				97B9D050158AD6DD0085BC63 /* MainMenu.xib in Resources */,
 				97B9D055158AD7470085BC63 /* loadingbutton.png in Resources */,
 				97B9D056158AD7470085BC63 /* pausebutton.png in Resources */,
@@ -529,14 +524,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		97B9D04B158AD6DD0085BC63 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				97B9D04C158AD6DD0085BC63 /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		97B9D04D158AD6DD0085BC63 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
