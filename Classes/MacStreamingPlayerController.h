@@ -22,10 +22,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/CoreAnimation.h>
 #import "AudioStreamer.h"
 #import "NSBufferSlider.h"
 
-@interface MacStreamingPlayerController : NSObject <AudioStreamerDelegate, NSTextFieldDelegate>
+@interface MacStreamingPlayerController : NSObject <AudioStreamerDelegate, NSTextFieldDelegate, CAAnimationDelegate>
 {
     IBOutlet NSWindow *window;
 	IBOutlet NSTextField *downloadSourceField;

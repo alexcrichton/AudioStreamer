@@ -22,9 +22,6 @@
 //
 
 #import "iPhoneStreamingPlayerViewController.h"
-#import <QuartzCore/CoreAnimation.h>
-#import <MediaPlayer/MediaPlayer.h>
-#import <CFNetwork/CFNetwork.h>
 
 @implementation iPhoneStreamingPlayerViewController
 

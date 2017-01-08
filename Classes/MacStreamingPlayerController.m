@@ -22,7 +22,6 @@
 //
 
 #import "MacStreamingPlayerController.h"
-#import <QuartzCore/CoreAnimation.h>
 
 @implementation MacStreamingPlayerController
 

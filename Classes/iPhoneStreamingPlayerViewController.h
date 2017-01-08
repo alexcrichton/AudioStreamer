@@ -22,10 +22,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <QuartzCore/CoreAnimation.h>
 #import "iOSStreamer.h"
 #import "UIBufferSlider.h"
 
-@interface iPhoneStreamingPlayerViewController : UIViewController <iOSStreamerDelegate>
+@interface iPhoneStreamingPlayerViewController : UIViewController <iOSStreamerDelegate, CAAnimationDelegate>
 {
 	IBOutlet UITextField *downloadSourceField;
 	IBOutlet UIButton *button;
