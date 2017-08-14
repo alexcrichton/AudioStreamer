@@ -587,7 +587,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
         UInt32 nextFillBuffer = _fillBufferIndex +1;
         if (nextFillBuffer >= _bufferCount) nextFillBuffer = 0;
         UInt32 i = nextFillBuffer;
-        UInt32 last = 0;
         while (i != _fillBufferIndex)
         {
             UInt32 packetStart = oldBuffers[i]->packetStart;
@@ -595,7 +594,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
             if (packetCount != 0)
             {
                 UInt32 packetEnd = packetStart + packetCount - 1;
-                last = packetEnd;
                 if (packetEnd >= *seekPacket)
                 {
                     if (packetEnd >= endPacket)
