@@ -724,7 +724,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     // Method three (similar to two)
     if (processedPacketsCount > BitRateEstimationMinPackets) {
       double averagePacketByteSize = processedPacketsSizeTotal /
-                                      processedPacketsCount;
+                                      (double)processedPacketsCount;
       /* bits/byte x bytes/packet x packets/sec = bits/sec */
       *rate = averagePacketByteSize;
       bitrateEstimated = true;
@@ -1589,15 +1589,13 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       id3TagSize = ((bytes[6] & 0x7F) << 21) | ((bytes[7] & 0x7F) << 14) |
                     ((bytes[8] & 0x7F) << 7) | (bytes[9] & 0x7F);
 
-      if (length < id3TagSize) {
+      if ((length - 10) < id3TagSize) {
         LOG_WARN(@"Not enough data received to parse ID3.");
         id3ParserState = ID3_STATE_PARSED;
         break;
-      }
-
-      if (id3TagSize > 0) {
+      } else {
         if (id3Version <= 3 && (id3FlagInfo & ID3_FLAG_UNSYNC)) {
-          for (int pos = 10, last = 0, i = 0; pos < id3TagSize; pos++) {
+          for (int pos = 10, last = 0, i = 0; pos < (id3TagSize + 10); pos++) {
             UInt8 byte = bytes[pos];
             if (last != 0xFF || byte != 0) {
               syncedBytes[i++] = byte;
@@ -1605,7 +1603,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
             last = byte;
           }
         } else {
-          for (int pos = 10, i = 0; pos < id3TagSize; pos++, i++) {
+          for (int pos = 10, i = 0; i < id3TagSize; pos++, i++) {
             syncedBytes[i] = bytes[pos];
           }
         }
@@ -1644,7 +1642,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       NSString *id3Title;
       NSString *id3Artist;
 
-      while ((pos + 10) < id3TagSize) {
+      while (pos < id3TagSize) {
         int startPos = pos;
 
         int frameSize;
@@ -2099,8 +2097,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
         return;
       }
 
-      for (UInt32 i = 0; i * sizeof(AudioFormatListItem) < formatListSize;
-           i += sizeof(AudioFormatListItem)) {
+      for (UInt32 i = 0; i * sizeof(AudioFormatListItem) < formatListSize; i++) {
         AudioStreamBasicDescription pasbd = formatList[i].mASBD;
 
         if (pasbd.mFormatID == kAudioFormatMPEG4AAC_HE || pasbd.mFormatID == kAudioFormatMPEG4AAC_HE_V2)
@@ -2209,27 +2206,25 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       }
     }
   } else {
-    size_t offset = 0;
-    while (inNumberBytes && !waitingOnBuffer && queued_cbr_head == NULL) {
-      size_t copySize;
-      int ret = [self handleCBRPacket:(inInputData + offset)
-                             byteSize:inNumberBytes
-                             copySize:&copySize];
+    UInt32 packetSize = (inNumberBytes / inNumberPackets);
+    UInt32 i;
+    for (i = 0; i < inNumberPackets && !waitingOnBuffer && queued_cbr_head == NULL; i++) {
+      int ret = [self handleCBRPacket:(inInputData + (packetSize * i))
+                             byteSize:packetSize];
       CHECK_ERR(ret < 0, AS_AUDIO_QUEUE_ENQUEUE_FAILED, @"");
       if (!ret) break;
-      inNumberBytes -= copySize;
-      offset += copySize;
     }
-    while (inNumberBytes) {
+    if (i == inNumberPackets) return;
+
+    for (; i < inNumberPackets; i++) {
       /* Allocate the packet */
-      size_t size = MIN(packetBufferSize - bytesFilled, inNumberBytes);
-      queued_cbr_packet_t *packet = malloc(sizeof(queued_cbr_packet_t) + size);
+      queued_cbr_packet_t *packet = malloc(sizeof(queued_cbr_packet_t) + packetSize);
       CHECK_ERR(packet == NULL, AS_AUDIO_QUEUE_ENQUEUE_FAILED, @"");
 
       /* Prepare the packet */
       packet->next = NULL;
-      packet->byteSize = inNumberBytes;
-      memcpy(packet->data, inInputData + offset, size);
+      packet->byteSize = packetSize;
+      memcpy(packet->data, inInputData + (packetSize * i), packetSize);
 
       if (queued_cbr_head == NULL) {
         queued_cbr_head = queued_cbr_tail = packet;
@@ -2237,9 +2232,6 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
         queued_cbr_tail->next = packet;
         queued_cbr_tail = packet;
       }
-
-      inNumberBytes -= size;
-      offset += size;
     }
   }
 }
@@ -2297,8 +2289,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 }
 
 - (int)handleCBRPacket:(const void*)data
-              byteSize:(UInt32)byteSize
-              copySize:(size_t*)copySize{
+              byteSize:(UInt32)byteSize {
   assert(audioQueue != NULL);
 
   size_t bufSpaceRemaining = packetBufferSize - bytesFilled;
@@ -2312,15 +2303,12 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 
   if ([self isDone]) return 0;
 
-  bufSpaceRemaining = packetBufferSize - bytesFilled;
-  *copySize = MIN(bufSpaceRemaining, byteSize);
-
   AudioQueueBufferRef buf = buffers[fillBufferIndex]->ref;
-  memcpy(buf->mAudioData + bytesFilled, data, *copySize);
+  memcpy(buf->mAudioData + bytesFilled, data, byteSize);
 
-  bytesFilled += *copySize;
-  packetsFilled += *copySize;
-  processedPacketsCount += *copySize;
+  bytesFilled += byteSize;
+  packetsFilled += byteSize;
+  processedPacketsCount += byteSize;
 
   buffers[fillBufferIndex]->packetStart = processedPacketsCount;
 
@@ -2352,10 +2340,8 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   /* Queue up as many packets as possible into the buffers */
   while (queued_vbr_head != NULL || queued_cbr_head != NULL) {
     if (queued_cbr_head != NULL) {
-      size_t copySize;
       int ret = [self handleCBRPacket:queued_cbr_head->data
-                             byteSize:queued_cbr_head->byteSize
-                             copySize:&copySize];
+                             byteSize:queued_cbr_head->byteSize];
       CHECK_ERR(ret < 0, AS_AUDIO_QUEUE_ENQUEUE_FAILED, @"");
       if (ret == 0) break;
       queued_cbr_packet_t *next_cbr = queued_cbr_head->next;
