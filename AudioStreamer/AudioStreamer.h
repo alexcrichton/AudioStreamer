@@ -424,9 +424,7 @@ struct queued_cbr_packet;
   int    icyDataBytesRead;    /* How many data bytes have been read in an ICY stream since metadata? */
   NSMutableString *icyMetadata;     /* The string of metadata itself, as it is being read */
   double icyBitrate;          /* The bitrate of the ICY stream */
-  UInt64 icyMetadataPacket;   /* The packet at which we received the metadata
-															 * - used to determine when to update the current song */
-  NSString *icyPendingCurrentSong;  /* The current song we have received, and are waiting to update */
+  NSMutableDictionary<NSNumber *, NSString *> *icyMetadataQueue;
 
   /* Miscellaneous metadata */
   bool   discontinuous;      /* flag to indicate the middle of a stream */

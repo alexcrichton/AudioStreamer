@@ -1143,8 +1143,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   icyDataBytesRead = 0;
   icyHeadersParsed = false;
   icyMetadata = nil;
-  icyMetadataPacket = 0;
-  icyPendingCurrentSong = nil;
+  icyMetadataQueue = [NSMutableDictionary dictionary];
   [self setCurrentSong:nil];
 
   /* When seeking to a time within the stream, we both already know the file
@@ -1499,9 +1498,8 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
               NSString *value = [metadataLine substringWithRange:NSMakeRange(scanLoc, [metadataLine length] - scanLoc - 1)];
 
               LOG_INFO(@"ICY stream title read: %@", value);
-              icyMetadataPacket = audioPacketsReceived;
-              icyPendingCurrentSong = value;
-              LOG_DEBUG(@"ICY: Current song update queued for packet %llu.", icyMetadataPacket);
+              icyMetadataQueue[@(audioPacketsReceived)] = value;
+              LOG_DEBUG(@"ICY: Current song update queued for packet %llu.", audioPacketsReceived);
             }
             icyDataBytesRead = 0;
           }
@@ -1820,10 +1818,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   }
 }
 
-- (void)updateICYCurrentSong {
-  if (icyPendingCurrentSong == nil) return;
-  [self setCurrentSong:icyPendingCurrentSong];
-  icyPendingCurrentSong = nil;
+- (void)updateICYCurrentSong:(unsigned long)idx {
+  if (icyMetadataQueue[@(idx)] == nil) return;
+  [self setCurrentSong:icyMetadataQueue[@(idx)]];
+  [icyMetadataQueue removeObjectForKey:@(idx)];
   LOG_INFO(@"ICY: Current song updated to \"%@\".", _currentSong);
 }
 
@@ -2418,23 +2416,30 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   buffers[idx]->inuse = false;
   buffersUsed--;
 
-  if (icyPendingCurrentSong != nil) {
+  if ([icyMetadataQueue count] > 0) {
     UInt32 nextIdx = idx + 1;
     if (nextIdx == _bufferCount) nextIdx = 0;
     buffer_t *nextBuffer = buffers[nextIdx];
-    if (nextBuffer->packetStart >= icyMetadataPacket) {
-      [self updateICYCurrentSong];
-    } else if ((nextBuffer->packetStart + nextBuffer->packetCount) >= icyMetadataPacket) {
-      UInt32 packetOffset = (UInt32)(icyMetadataPacket - nextBuffer->packetStart);
-      UInt64 framesToWait = _streamDescription.mFramesPerPacket * packetOffset;
-      if (framesToWait == 0 && vbr) {
-        for (UInt32 i = 0; i < packetOffset; i++) {
-          framesToWait += nextBuffer->packetDescs[i].mVariableFramesInPacket;
+
+    NSArray<NSNumber *> *packetsToCheck = [[icyMetadataQueue allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSNumber *metadataPacketNum in packetsToCheck) {
+      unsigned long metadataPacketIdx = [metadataPacketNum unsignedLongValue];
+      if (nextBuffer->packetStart >= metadataPacketIdx) {
+        [self updateICYCurrentSong:metadataPacketIdx];
+      } else if ((nextBuffer->packetStart + nextBuffer->packetCount) >= metadataPacketIdx) {
+        UInt32 packetOffset = (UInt32)(metadataPacketIdx - nextBuffer->packetStart);
+        UInt64 framesToWait = _streamDescription.mFramesPerPacket * packetOffset;
+        if (framesToWait == 0 && vbr) {
+          for (UInt32 i = 0; i < packetOffset; i++) {
+            framesToWait += nextBuffer->packetDescs[i].mVariableFramesInPacket;
+          }
         }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(framesToWait / _streamDescription.mSampleRate * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+          [self updateICYCurrentSong:metadataPacketIdx];
+        });
+      } else {
+        break;
       }
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(framesToWait / _streamDescription.mSampleRate * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self updateICYCurrentSong];
-      });
     }
   }
 
