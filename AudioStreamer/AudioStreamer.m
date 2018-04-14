@@ -1142,7 +1142,9 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   icyMetaBytesRemaining = 0;
   icyDataBytesRead = 0;
   icyHeadersParsed = false;
-  icyMetadata = [NSMutableString string];
+  icyMetadata = nil;
+  icyMetadataPacket = 0;
+  icyPendingCurrentSong = nil;
   _currentSong = nil;
 
   /* When seeking to a time within the stream, we both already know the file
@@ -1496,9 +1498,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
               NSUInteger scanLoc = [scanner scanLocation];
               NSString *value = [metadataLine substringWithRange:NSMakeRange(scanLoc, [metadataLine length] - scanLoc - 1)];
 
-              LOG_INFO(@"ICY stream title (current song): %@", value);
-
-              _currentSong = value;
+              LOG_INFO(@"ICY stream title read: %@", value);
+              icyMetadataPacket = audioPacketsReceived;
+              icyPendingCurrentSong = value;
+              LOG_DEBUG(@"ICY: Current song update queued for packet %llu.", icyMetadataPacket);
             }
             icyDataBytesRead = 0;
           }
@@ -1807,6 +1810,13 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       break;
     }
   }
+}
+
+- (void)updateICYCurrentSong {
+  if (icyPendingCurrentSong == nil) return;
+  _currentSong = icyPendingCurrentSong;
+  icyPendingCurrentSong = nil;
+  LOG_INFO(@"ICY: Current song updated to \"%@\".", _currentSong);
 }
 
 //
@@ -2399,6 +2409,26 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   /* Signal the buffer is no longer in use */
   buffers[idx]->inuse = false;
   buffersUsed--;
+
+  if (icyPendingCurrentSong != nil) {
+    UInt32 nextIdx = idx + 1;
+    if (nextIdx == _bufferCount) nextIdx = 0;
+    buffer_t *nextBuffer = buffers[nextIdx];
+    if (nextBuffer->packetStart >= icyMetadataPacket) {
+      [self updateICYCurrentSong];
+    } else if ((nextBuffer->packetStart + nextBuffer->packetCount) >= icyMetadataPacket) {
+      UInt32 packetOffset = (UInt32)(icyMetadataPacket - nextBuffer->packetStart);
+      UInt64 framesToWait = _streamDescription.mFramesPerPacket * packetOffset;
+      if (framesToWait == 0 && vbr) {
+        for (UInt32 i = 0; i < packetOffset; i++) {
+          framesToWait += nextBuffer->packetDescs[i].mVariableFramesInPacket;
+        }
+      }
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(framesToWait / _streamDescription.mSampleRate * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self updateICYCurrentSong];
+      });
+    }
+  }
 
   /* If we're done with the buffers because the stream is dying, then there's no
    * need to call more methods on it */
