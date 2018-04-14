@@ -505,13 +505,11 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     UInt32 nextFillBuffer = fillBufferIndex +1;
     if (nextFillBuffer >= _bufferCount) nextFillBuffer = 0;
     UInt32 i = nextFillBuffer;
-    UInt32 last = 0;
     while (i != fillBufferIndex) {
       UInt32 packetStart = oldBuffers[i]->packetStart;
       UInt32 packetCount = oldBuffers[i]->packetCount;
       if (packetCount != 0) {
         UInt32 packetEnd = packetStart + packetCount - 1;
-        last = packetEnd;
         if (packetEnd >= seekPacket) {
           if (packetEnd >= endPacket) {
             endPacketIdx = i;
@@ -1555,6 +1553,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 
 - (void)parseID3TagsInBytes:(UInt8[])bytes length:(CFIndex)length
 {
+  assert(id3ParserState == ID3_STATE_INITIAL);
   UInt8 id3Version;
   int id3TagSize;
   AudioStreamerID3FlagInfo id3FlagInfo = 0;
