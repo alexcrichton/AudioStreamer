@@ -490,8 +490,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     }
     if (![self startAudioQueue]) return NO;
 
-    CFReadStreamScheduleWithRunLoop(stream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
-    rescheduled = true;
+    if (!waitingOnBuffer || _bufferInfinite) {
+      CFReadStreamScheduleWithRunLoop(stream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+      rescheduled = true;
+    }
 
     seeking = false;
     return YES;
@@ -577,8 +579,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 
       if (![self startAudioQueue]) return NO;
 
-      CFReadStreamScheduleWithRunLoop(stream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
-      rescheduled = true;
+      if (!waitingOnBuffer || _bufferInfinite) {
+        CFReadStreamScheduleWithRunLoop(stream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+        rescheduled = true;
+      }
 
       seeking = false;
       return YES;
