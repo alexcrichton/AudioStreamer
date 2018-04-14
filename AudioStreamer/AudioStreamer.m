@@ -31,7 +31,7 @@
 /* Defaults */
 #define kDefaultNumAQBufs 256
 #define kDefaultAQDefaultBufSize 8192
-#define kDefaultNumAQBufsToStart 32
+#define kDefaultNumAQBufsToStart 8
 #define kDefaultAudioFileType kAudioFileMP3Type
 
 /* CHECK_ERR */
