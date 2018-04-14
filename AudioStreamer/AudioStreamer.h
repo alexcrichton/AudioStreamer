@@ -247,6 +247,7 @@ struct queued_cbr_packet;
  * @see [AudioStreamer isWaiting]
  */
 - (void)streamerStatusDidChange:(AudioStreamer *)sender;
+
 /**
  * @brief Called when the stream has collected enough data to calculate the bitrate
  *
@@ -258,6 +259,14 @@ struct queued_cbr_packet;
  * @see [AudioStreamer calculatedBitRate:]
  */
 - (void)streamerBitrateIsReady:(AudioStreamer *)sender;
+
+/**
+ * @brief Called when the stream's current song has changed
+ *
+ * @param sender The streamer that called this method
+ * @param currentSong The new current song. This may be nil when opening a new stream
+ */
+- (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(NSString *)currentSong;
 
 @end
 

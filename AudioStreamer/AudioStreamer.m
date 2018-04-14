@@ -1145,7 +1145,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   icyMetadata = nil;
   icyMetadataPacket = 0;
   icyPendingCurrentSong = nil;
-  _currentSong = nil;
+  [self setCurrentSong:nil];
 
   /* When seeking to a time within the stream, we both already know the file
      length and the seekByteOffset will be set to know what to send to the
@@ -1795,11 +1795,11 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       }
 
       if (id3Title && id3Artist) {
-        _currentSong = [NSString stringWithFormat:@"%@ - %@", id3Artist, id3Title];
+        [self setCurrentSong:[NSString stringWithFormat:@"%@ - %@", id3Artist, id3Title]];
       } else if (id3Title) {
-        _currentSong = [NSString stringWithFormat:@"Unknown Artist - %@", id3Title];
+        [self setCurrentSong:[NSString stringWithFormat:@"Unknown Artist - %@", id3Title]];
       } else if (id3Artist) {
-        _currentSong = [NSString stringWithFormat:@"%@ - Unknown Title", id3Artist];
+        [self setCurrentSong:[NSString stringWithFormat:@"%@ - Unknown Title", id3Artist]];
       }
 
       LOG_INFO(@"ID3 Current Song: %@", _currentSong);
@@ -1812,9 +1812,17 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   }
 }
 
+- (void)setCurrentSong:(NSString *)currentSong {
+  _currentSong = currentSong;
+  __strong id <AudioStreamerDelegate> delegate = _delegate;
+  if (delegate && [delegate respondsToSelector:@selector(streamer:didUpdateCurrentSong:)]) {
+    [delegate streamer:self didUpdateCurrentSong:_currentSong];
+  }
+}
+
 - (void)updateICYCurrentSong {
   if (icyPendingCurrentSong == nil) return;
-  _currentSong = icyPendingCurrentSong;
+  [self setCurrentSong:icyPendingCurrentSong];
   icyPendingCurrentSong = nil;
   LOG_INFO(@"ICY: Current song updated to \"%@\".", _currentSong);
 }
