@@ -43,31 +43,31 @@ typedef NS_ENUM(NSUInteger, AudioStreamerState) {
   /**
    * The streamer has just been created and is waiting to start
    */
-  AS_INITIALIZED = 0,
+  AS_INITIALIZED NS_SWIFT_NAME(Initialized) = 0,
   /**
    * The streamer is waiting for enough data before playing
    */
-  AS_WAITING_FOR_DATA,
+  AS_WAITING_FOR_DATA NS_SWIFT_NAME(WaitingForData),
   /**
    * The streamer is waiting for the audio queue (player) to start
    */
-  AS_WAITING_FOR_QUEUE_TO_START,
+  AS_WAITING_FOR_QUEUE_TO_START NS_SWIFT_NAME(WaitingForQueueToStart),
   /**
    * The streamer is playing
    */
-  AS_PLAYING,
+  AS_PLAYING NS_SWIFT_NAME(Playing),
   /**
    * The streamer is paused
    */
-  AS_PAUSED,
+  AS_PAUSED NS_SWIFT_NAME(Paused),
   /**
    * The streamer is done. Call <[AudioStreamer doneReason]> for a reason
    */
-  AS_DONE,
+  AS_DONE NS_SWIFT_NAME(Done),
   /**
    * The streamer has been stopped by the <[AudioStreamer stop]> method
    */
-  AS_STOPPED
+  AS_STOPPED NS_SWIFT_NAME(Stopped)
 };
 
 /**
@@ -88,72 +88,72 @@ typedef NS_ENUM(NSInteger, AudioStreamerErrorCode)
   /**
    * The network connection to the stream has failed
    */
-  AS_NETWORK_CONNECTION_FAILED = 1000,
+  AS_NETWORK_CONNECTION_FAILED NS_SWIFT_NAME(NetworkConnectionFailed) = 1000,
   /**
    * The file stream threw an error when attempting to fetch a property
    */
-  AS_FILE_STREAM_GET_PROPERTY_FAILED = 1001,
+  AS_FILE_STREAM_GET_PROPERTY_FAILED NS_SWIFT_NAME(FileStreamGetPropertyFailed) = 1001,
   /**
    * The file stream threw an error when attempting to set a property
    */
-  AS_FILE_STREAM_SET_PROPERTY_FAILED = 1002,
+  AS_FILE_STREAM_SET_PROPERTY_FAILED NS_SWIFT_NAME(FileStreamSetPropertyFailed) = 1002,
   /**
    * The file stream threw an error when parsing the stream data
    */
-  AS_FILE_STREAM_PARSE_BYTES_FAILED = 1004,
+  AS_FILE_STREAM_PARSE_BYTES_FAILED NS_SWIFT_NAME(FileStreamParseBytesFailed) = 1004,
   /**
    * The file stream threw an error when opening
    */
-  AS_FILE_STREAM_OPEN_FAILED = 1005,
+  AS_FILE_STREAM_OPEN_FAILED NS_SWIFT_NAME(FileStreamOpenFailed) = 1005,
   /**
    * No audio could be found in stream
    */
-  AS_AUDIO_DATA_NOT_FOUND = 1007,
+  AS_AUDIO_DATA_NOT_FOUND NS_SWIFT_NAME(AudioDataNotFound) = 1007,
   /**
    * The audio queue (player) threw an error on creation
    */
-  AS_AUDIO_QUEUE_CREATION_FAILED = 1008,
+  AS_AUDIO_QUEUE_CREATION_FAILED NS_SWIFT_NAME(AudioQueueCreationFailed) = 1008,
   /**
    * The audio queue (player) threw an error when allocating buffers
    */
-  AS_AUDIO_QUEUE_BUFFER_ALLOCATION_FAILED = 1009,
+  AS_AUDIO_QUEUE_BUFFER_ALLOCATION_FAILED NS_SWIFT_NAME(AudioQueueBufferAllocationFailed) = 1009,
   /**
    * The audio queue (player) threw an error when enqueuing buffers
    */
-  AS_AUDIO_QUEUE_ENQUEUE_FAILED = 1010,
+  AS_AUDIO_QUEUE_ENQUEUE_FAILED NS_SWIFT_NAME(AudioQueueEnqueueFailed) = 1010,
   /**
    * The audio queue (player) threw an error when adding a property listener
    */
-  AS_AUDIO_QUEUE_ADD_LISTENER_FAILED = 1011,
+  AS_AUDIO_QUEUE_ADD_LISTENER_FAILED NS_SWIFT_NAME(AudioQueueAddListenerFailed) = 1011,
   /**
    * The audio queue (player) threw an error on start
    */
-  AS_AUDIO_QUEUE_START_FAILED = 1013,
+  AS_AUDIO_QUEUE_START_FAILED NS_SWIFT_NAME(AudioQueueStartFailed) = 1013,
   /**
    * The audio queue (player) threw an error on pause
    */
-  AS_AUDIO_QUEUE_PAUSE_FAILED = 1014,
+  AS_AUDIO_QUEUE_PAUSE_FAILED NS_SWIFT_NAME(AudioQueuePauseFailed) = 1014,
   /**
    * There was a mismatch in the audio queue's (player's) buffers.
    * Perhaps you set <[AudioStreamer bufferCount]> while the stream was running?
    */
-  AS_AUDIO_QUEUE_BUFFER_MISMATCH = 1015,
+  AS_AUDIO_QUEUE_BUFFER_MISMATCH NS_SWIFT_NAME(AudioQueueBufferMismatch) = 1015,
   /**
    * The audio queue (player) threw an error on stop
    */
-  AS_AUDIO_QUEUE_STOP_FAILED = 1017,
+  AS_AUDIO_QUEUE_STOP_FAILED NS_SWIFT_NAME(AudioQueueStopFailed) = 1017,
   /**
    * The audio queue (player) threw an error while flushing
    */
-  AS_AUDIO_QUEUE_FLUSH_FAILED = 1018,
+  AS_AUDIO_QUEUE_FLUSH_FAILED NS_SWIFT_NAME(AudioQueueFlushFailed) = 1018,
   /**
    * The buffer size is too small. Try increasing <[AudioStreamer bufferSize]>
    */
-  AS_AUDIO_BUFFER_TOO_SMALL = 1021,
+  AS_AUDIO_BUFFER_TOO_SMALL NS_SWIFT_NAME(AudioQueueBufferTooSmall) = 1021,
   /**
    * The connection to the stream timed out
    */
-  AS_TIMED_OUT = 1022
+  AS_TIMED_OUT NS_SWIFT_NAME(NetworkConnectionTimedOut) = 1022
 };
 
 /**
@@ -163,19 +163,22 @@ typedef NS_ENUM(NSInteger, AudioStreamerDoneReason) {
   /**
    * The streamer has ended with an error. Check <[AudioStreamer error]> for information
    */
-  AS_DONE_ERROR = -1,
+  AS_DONE_ERROR NS_SWIFT_NAME(Error) = -1,
   /**
    * The streamer is not done
    */
-  AS_NOT_DONE = 0,
+  AS_NOT_DONE NS_SWIFT_NAME(NotDone) = 0,
   /**
    * The streamer was stopped through the <[AudioStreamer stop]> method
    */
-  AS_DONE_STOPPED = 1,
+  AS_DONE_STOPPED NS_SWIFT_NAME(Stopped) = 1,
   /**
    * The streamer has reached the end of the file
    */
-  AS_DONE_EOF = 2
+#pragma push_macro("EOF")
+#undef EOF
+  AS_DONE_EOF NS_SWIFT_NAME(EOF) = 2
+#pragma pop_macro("EOF")
 };
 
 /**
@@ -190,34 +193,34 @@ typedef NS_ENUM(NSUInteger, AudioStreamerLogLevel) {
 	/**
 	 * No logging will occur.
 	 */
-	AS_LOG_LEVEL_NONE = 0,
+	AS_LOG_LEVEL_NONE NS_SWIFT_NAME(None) = 0,
 	/**
 	 * Logging will only occur in the event of a fatal error such as an assertion.
 	 */
-	AS_LOG_LEVEL_FATAL,
+	AS_LOG_LEVEL_FATAL NS_SWIFT_NAME(Fatal),
 	/**
 	 * Logging will occur when the streamer encounters a error that has caused the streamer
 	 * to stop.
 	 */
-	AS_LOG_LEVEL_ERROR,
+	AS_LOG_LEVEL_ERROR NS_SWIFT_NAME(Error),
 	/**
 	 * Logging will occur when the streamer encounters an issue but not necessarily one that
 	 * has resulted in the streamer having to stop.
 	 */
-	AS_LOG_LEVEL_WARN,
+	AS_LOG_LEVEL_WARN NS_SWIFT_NAME(Warn),
 	/**
 	 * Logging will occur when the streamer has reached a point of interest in its streaming.
 	 */
-	AS_LOG_LEVEL_INFO,
+	AS_LOG_LEVEL_INFO NS_SWIFT_NAME(Info),
 	/**
 	 * Logging will occur when the streamer has information that may be useful when debugging
 	 * the streamer.
 	 */
-	AS_LOG_LEVEL_DEBUG,
+	AS_LOG_LEVEL_DEBUG NS_SWIFT_NAME(Debug),
 	/**
 	 * Logging will occur at most steps in the streamer's process. Expect a lot of logs!
 	 */
-	AS_LOG_LEVEL_VERBOSE
+	AS_LOG_LEVEL_VERBOSE NS_SWIFT_NAME(Verbose)
 };
 
 enum AudioStreamerProxyType : NSUInteger;
@@ -227,6 +230,8 @@ struct queued_vbr_packet;
 struct queued_cbr_packet;
 
 @class AudioStreamer;
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The AudioStreamerDelegate protocol provides callbacks for events that may happen
@@ -266,7 +271,7 @@ struct queued_cbr_packet;
  * @param sender The streamer that called this method
  * @param currentSong The new current song. This may be nil when opening a new stream
  */
-- (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(NSString *)currentSong;
+- (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(nullable NSString *)currentSong;
 
 @end
 
@@ -364,14 +369,14 @@ struct queued_cbr_packet;
    * internal inconsistencies in the stream. Detail explanations of each
    * property can be found in the source */
   enum AudioStreamerProxyType proxyType; /* defaults to whatever the system says */
-  NSString        *proxyHost;
-  int             proxyPort;
+  NSString * _Nullable proxyHost;
+  int proxyPort;
 
   /* Created as part of the <start> method */
   CFReadStreamRef stream;
 
   /* Timeout management */
-  NSTimer *timeout; /* timer managing the timeout event */
+  NSTimer * _Nullable timeout; /* timer managing the timeout event */
   bool unscheduled; /* flag if the http stream is unscheduled */
   bool rescheduled; /* flag if the http stream was rescheduled */
   int events;       /* events which have happened since the last tick */
@@ -395,7 +400,7 @@ struct queued_cbr_packet;
    * packets, so the packetDescs array is a list of packets which describes the
    * data in the next pending buffer (used to enqueue data into the AudioQueue
    * structure */
-  struct buffer **buffers; /* Information for each buffer */
+  struct buffer ** _Nullable buffers; /* Information for each buffer */
   AudioStreamPacketDescription packetDescs[kAQMaxPacketDescs];
   UInt32 packetsFilled;         /* number of valid entries in packetDescs */
   UInt32 bytesFilled;           /* bytes in use in the pending buffer */
@@ -404,10 +409,10 @@ struct queued_cbr_packet;
 
   /* cache state (see above description) */
   bool waitingOnBuffer;
-  struct queued_vbr_packet *queued_vbr_head;
-  struct queued_vbr_packet *queued_vbr_tail;
-  struct queued_cbr_packet *queued_cbr_head;
-  struct queued_cbr_packet *queued_cbr_tail;
+  struct queued_vbr_packet * _Nullable queued_vbr_head;
+  struct queued_vbr_packet * _Nullable queued_vbr_tail;
+  struct queued_cbr_packet * _Nullable queued_cbr_head;
+  struct queued_cbr_packet * _Nullable queued_cbr_tail;
 
   /* Internal metadata about state */
   AudioStreamerState state_;
@@ -422,7 +427,7 @@ struct queued_cbr_packet;
   int    icyMetaInterval;     /* The interval between ICY metadata bytes */
   UInt16 icyMetaBytesRemaining;     /* How many bytes of ICY metadata are left? */
   int    icyDataBytesRead;    /* How many data bytes have been read in an ICY stream since metadata? */
-  NSMutableString *icyMetadata;     /* The string of metadata itself, as it is being read */
+  NSMutableString * _Nullable icyMetadata; /* The string of metadata itself, as it is being read */
   double icyBitrate;          /* The bitrate of the ICY stream */
   NSMutableDictionary<NSNumber *, NSString *> *icyMetadataQueue;
 
@@ -459,7 +464,7 @@ struct queued_cbr_packet;
  * @param url The remote source of audio
  * @return The stream to configure and being playback with
  */
-+ (instancetype)streamWithURL:(NSURL*)url;
++ (instancetype)streamWithURL:(NSURL *)url NS_SWIFT_NAME(init(URL:));
 
 /** @name Properties of the audio stream */
 
@@ -468,7 +473,7 @@ struct queued_cbr_packet;
  *
  * @see AudioStreamerDelegate
  */
-@property (nonatomic, readwrite, weak) id <AudioStreamerDelegate> delegate;
+@property (nonatomic, readwrite, weak, nullable) id <AudioStreamerDelegate> delegate;
 
 /**
  * @brief Tests whether the stream is playing
@@ -548,14 +553,14 @@ struct queued_cbr_packet;
  *
  * @see AudioStreamerErrorCode
  */
-@property (readonly) NSError *error;
+@property (readonly, nullable) NSError *error;
 
 /**
  * @brief Headers received from the remote source
  *
  * @details Used to determine file size, but other information may be useful as well
  */
-@property (readonly) NSDictionary *httpHeaders;
+@property (readonly, nullable) NSDictionary *httpHeaders;
 
 /**
  * @brief The remote resource that this stream is playing
@@ -584,7 +589,7 @@ struct queued_cbr_packet;
  *
  * The current song field is sometimes used as the stream title on some ICY streams.
  */
-@property (readonly) NSString *currentSong;
+@property (readonly, nullable) NSString *currentSong;
 
 /**
  * @brief The number of audio buffers to have
@@ -724,7 +729,7 @@ struct queued_cbr_packet;
  *
  * Default: nil
  */
-@property (readwrite, copy) void (^logHandler)(NSString *msg);
+@property (readwrite, copy, nullable) void (^logHandler)(NSString *msg);
 
 /**
  * @brief Set an HTTP proxy for this stream
@@ -732,7 +737,7 @@ struct queued_cbr_packet;
  * @param host The address/hostname of the remote host
  * @param port The port of the proxy
  */
-- (void)setHTTPProxy:(NSString*)host port:(int)port;
+- (void)setHTTPProxy:(NSString *)host port:(int)port;
 
 /**
  * @brief Set SOCKS proxy for this stream
@@ -740,7 +745,7 @@ struct queued_cbr_packet;
  * @param host The address/hostname of the remote host
  * @param port The port of the proxy
  */
-- (void)setSOCKSProxy:(NSString*)host port:(int)port;
+- (void)setSOCKSProxy:(NSString *)host port:(int)port;
 
 /** @name Management of the stream */
 
@@ -823,7 +828,7 @@ struct queued_cbr_packet;
  * @return YES if the bit rate could be calculated with a high degree of
  *         certainty, or NO if it could not be.
  */
-- (BOOL)calculatedBitRate:(double*)ret;
+- (BOOL)calculatedBitRate:(nullable double *)ret;
 
 /**
  * @brief Attempt to set the volume on the audio queue
@@ -847,7 +852,7 @@ struct queued_cbr_packet;
  *         could not be determined. In the NO case, the contents of ret are
  *         undefined
  */
-- (BOOL)duration:(double*)ret;
+- (BOOL)duration:(nullable double *)ret;
 
 /**
  * @brief Calculate the progress into the stream, in seconds
@@ -860,7 +865,7 @@ struct queued_cbr_packet;
  * @return YES if the progress of the stream was determined, or NO if the
  *         progress could not be determined at this time
  */
-- (BOOL)progress:(double*)ret;
+- (BOOL)progress:(nullable double *)ret;
 
 /**
  * @brief Calculate the buffer progress into the stream, in seconds
@@ -874,7 +879,7 @@ struct queued_cbr_packet;
  * @return YES if the buffer progress of the stream was determined, or NO if the buffer
  *         progress could not be determined at this time
  */
-- (BOOL)bufferProgress:(double*)ret;
+- (BOOL)bufferProgress:(nullable double *)ret;
 
 /**
  * @brief Fade in playback
@@ -899,3 +904,5 @@ struct queued_cbr_packet;
 - (BOOL)fadeOutDuration:(float)duration;
 
 @end
+
+NS_ASSUME_NONNULL_END

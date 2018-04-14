@@ -652,7 +652,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   return NO;
 }
 
-- (BOOL)progress:(double*)ret {
+- (BOOL)progress:(double *)ret {
   double sampleRate = _streamDescription.mSampleRate;
   if (state_ == AS_STOPPED) {
     *ret = lastProgress;
@@ -678,7 +678,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   return YES;
 }
 
-- (BOOL)bufferProgress:(double*)ret {
+- (BOOL)bufferProgress:(double *)ret {
   if (state_ != AS_PLAYING && state_ != AS_PAUSED)
     return NO;
 
@@ -689,7 +689,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   return YES;
 }
 
-- (BOOL)calculatedBitRate:(double*)rate {
+- (BOOL)calculatedBitRate:(double *)rate {
   if (icyBitrate > 0)
   {
     *rate = icyBitrate;
@@ -744,7 +744,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   }
 }
 
-- (BOOL)duration:(double*)ret {
+- (BOOL)duration:(double *)ret {
   if (fileLength == 0) return NO;
 
   double packetDuration = _streamDescription.mFramesPerPacket / _streamDescription.mSampleRate;
