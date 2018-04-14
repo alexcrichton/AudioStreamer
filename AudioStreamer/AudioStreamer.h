@@ -447,7 +447,6 @@ NS_ASSUME_NONNULL_BEGIN
   bool   didConnect;          /* Did we connect successfully at some point? */
   bool   queuePaused;         /* Is the audio queue paused? */
   bool   bitrateEstimated;    /* Was the last bitrate calculation an estimate? */
-  bool   defaultBufferSizeUsed;     /* Was the default buffer size used? */
   UInt64 audioBytesReceived;  /* The total number of audio bytes we have received so far */
   UInt64 audioPacketsReceived;    /* The total number of audio packets we have received so far */
 }

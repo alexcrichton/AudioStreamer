@@ -1943,12 +1943,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       if (osErr || packetBufferSize == 0) {
         // No packet size available, just use the default
         packetBufferSize = _bufferSize;
-        defaultBufferSizeUsed = true;
       }
     }
   } else {
     packetBufferSize = _bufferSize;
-    defaultBufferSizeUsed = true;
   }
 
   // allocate audio queue buffers
@@ -2488,20 +2486,6 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       OSStatus osErr = AudioQueuePause(audioQueue);
       CHECK_ERR(osErr, AS_AUDIO_QUEUE_PAUSE_FAILED, [[self class] descriptionForAQErrorCode:osErr]);
       queuePaused = true;
-
-      /* This can either fix or delay the problem
-       * If it cannot fix it, the network is simply too slow */
-      if (defaultBufferSizeUsed && packetBufferSize < 65536 && !seeking) {
-        packetBufferSize = packetBufferSize * 2;
-        for (UInt32 j = 0; j < _bufferCount; ++j) {
-          AudioQueueFreeBuffer(audioQueue, buffers[j]->ref);
-        }
-        for (UInt32 i = 0; i < _bufferCount; ++i) {
-          osErr = AudioQueueAllocateBuffer(audioQueue, packetBufferSize,
-                                           &(buffers[i]->ref));
-          CHECK_ERR(osErr, AS_AUDIO_QUEUE_BUFFER_ALLOCATION_FAILED, [[self class] descriptionForAQErrorCode:osErr]);
-        }
-      }
 
       [self setState:AS_WAITING_FOR_DATA];
     }
