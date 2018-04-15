@@ -10,6 +10,8 @@
 
 @class iOSStreamer;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The iOSStreamerDelegate protocol extends the <AudioStreamerDelegate> and provides
  * callbacks for the interruption events that the <iOSStreamer> class deals with.
@@ -66,7 +68,7 @@
  * @see iOSStreamerDelegate
  * @see AudioStreamerDelegate
  */
-@property (nonatomic, readwrite, weak) id <iOSStreamerDelegate> delegate;
+@property (nonatomic, readwrite, weak, nullable) id <iOSStreamerDelegate> delegate;
 
 /**
  * @brief Whether the stream is currently interrupted
@@ -78,3 +80,5 @@
 @property (readonly, getter=isInterrupted) BOOL interrupted;
 
 @end
+
+NS_ASSUME_NONNULL_END
