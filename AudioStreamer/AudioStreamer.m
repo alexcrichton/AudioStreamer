@@ -79,7 +79,7 @@
       NSString *msg = [NSString stringWithFormat:@"%s " fmt, __PRETTY_FUNCTION__, ##args];\
       if ([self logHandler])\
         [self logHandler](msg);\
-      else\
+      else \
         NSLog(@"%@", msg);\
     }\
   } while (0)
