@@ -2155,7 +2155,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   if (!audioQueue) {
     vbr = (inPacketDescriptions != NULL);
 
-    if (fileLength != 0) {
+    if (fileLength != 0 && seekable) {
       OSStatus status = 0;
       UInt32 ioFlags = 0;
       SInt64 byteOffset;
