@@ -175,10 +175,7 @@ typedef NS_ENUM(NSInteger, AudioStreamerDoneReason) {
   /**
    * The streamer has reached the end of the file
    */
-#pragma push_macro("EOF")
-#undef EOF
-  AS_DONE_EOF NS_SWIFT_NAME(EOF) = 2
-#pragma pop_macro("EOF")
+  AS_DONE_EOF __attribute__((swift_name("EOF"))) = 2
 };
 
 /**
