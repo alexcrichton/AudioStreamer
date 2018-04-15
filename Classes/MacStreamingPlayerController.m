@@ -284,29 +284,28 @@
 	{
 		[positionLabel setStringValue:@"Time Played:"];
 	}
+}
 
-	NSString *currentSong = [streamer currentSong];
-	if (currentSong && [streamInfoLabel stringValue] != currentSong)
+- (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(NSString *)currentSong
+{
+	NSRect frame = [window frame];
+
+	if (currentSong != nil)
 	{
-		[streamInfoLabel setStringValue:currentSong];
-		NSRect frame = [window frame];
 		frame.size.height = 184;
-		[window setMinSize:frame.size];
-		[window setMaxSize:frame.size];
-		[window setFrame:frame display:YES];
-		[self adjustStreamInfoFontSize];
-		[self restartButtonAnimation];
 	}
-	else if (!currentSong && ![[streamInfoLabel stringValue] isEqualToString:@""])
+	else
 	{
-		[streamInfoLabel setStringValue:@""];
-		NSRect frame = [window frame];
+		currentSong = @"";
 		frame.size.height = 159;
-		[window setMinSize:frame.size];
-		[window setMaxSize:frame.size];
-		[window setFrame:frame display:YES];
-		[self restartButtonAnimation];
 	}
+
+	[streamInfoLabel setStringValue:currentSong];
+	[window setMinSize:frame.size];
+	[window setMaxSize:frame.size];
+	[window setFrame:frame display:YES];
+	[self adjustStreamInfoFontSize];
+	[self restartButtonAnimation];
 }
 
 //
@@ -316,6 +315,8 @@
 //
 - (void)adjustStreamInfoFontSize
 {
+	if ([[streamInfoLabel stringValue] length] == 0) return;
+
 	NSString *fontName = [[streamInfoLabel font] fontName];
 	NSSize targetSize = [streamInfoLabel frame].size;
 	int i;

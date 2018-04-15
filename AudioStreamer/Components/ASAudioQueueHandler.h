@@ -126,6 +126,9 @@ typedef NS_ENUM(NSInteger, ASAudioQueueSeekResult)
 };
 
 
+typedef void (^ASAudioQueueCallback)(void);
+
+
 extern NSString * const ASAudioQueueErrorDomain;
 
 
@@ -154,7 +157,6 @@ extern NSString * const ASAudioQueueErrorDomain;
 
     /* Once properties have been read, packets arrive, and the audio queue is
      created once the first packet arrives */
-    BOOL _defaultBufferSizeUsed; /* Was the default buffer size used? */
 
     /* When receiving audio data, raw data is placed into these buffers. The
      * buffers are essentially a "ring buffer of buffers" as each buffer is cycled
@@ -187,6 +189,8 @@ extern NSString * const ASAudioQueueErrorDomain;
     BOOL _awaitingDataFromSeek;
     BOOL _vbr; /* Are we playing a VBR stream? */
     BOOL _bitrateNotification; /* notified that the bitrate is ready */
+
+    NSMutableDictionary<NSNumber *, ASAudioQueueCallback> *_callbackQueue;
 }
 
 @property (nonatomic, weak) id <ASAudioQueueHandlerDelegate> delegate;
@@ -202,8 +206,7 @@ extern NSString * const ASAudioQueueErrorDomain;
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStreamDescription:(AudioStreamBasicDescription)asbd
                               bufferCount:(UInt32)bufferCount
-                               packetSize:(UInt32)packetSize
-                     packetSizeCalculated:(BOOL)calculated NS_DESIGNATED_INITIALIZER;
+                               packetSize:(UInt32)packetSize NS_DESIGNATED_INITIALIZER;
 
 - (void)setPlaybackRate:(AudioQueueParameterValue)playbackRate;
 - (void)setMagicCookie:(void *)cookieData withSize:(UInt32)cookieSize;
@@ -235,5 +238,7 @@ extern NSString * const ASAudioQueueErrorDomain;
                 numberBytes:(UInt32)numberBytes
               numberPackets:(UInt32)numberPackets
          packetDescriptions:(AudioStreamPacketDescription *)packetDescriptions;
+
+- (void)queueCallback:(ASAudioQueueCallback)callback;
 
 @end

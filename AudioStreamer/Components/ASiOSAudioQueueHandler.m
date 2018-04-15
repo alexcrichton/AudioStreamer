@@ -12,12 +12,10 @@
 - (instancetype)initWithStreamDescription:(AudioStreamBasicDescription)asbd
                               bufferCount:(UInt32)bufferCount
                                packetSize:(UInt32)packetSize
-                     packetSizeCalculated:(BOOL)calculated
 {
     if ((self = [super initWithStreamDescription:asbd
                                      bufferCount:bufferCount
-                                      packetSize:packetSize
-                            packetSizeCalculated:calculated]))
+                                      packetSize:packetSize]))
     {
         if (![self isDone])
         {

@@ -133,6 +133,16 @@
   return [_readStreamHandler isSeekable] && ![_audioQueueHandler isFinishing] && [self duration:&tmp] && [self calculatedBitRate:&tmp] && tmp != 0.0;
 }
 
+- (void)setCurrentSong:(NSString * _Nullable)currentSong
+{
+  _currentSong = currentSong;
+  __strong id <AudioStreamerDelegate> delegate = _delegate;
+  if (delegate && [delegate respondsToSelector:@selector(streamer:didUpdateCurrentSong:)]) {
+    [delegate streamer:self didUpdateCurrentSong:currentSong];
+  }
+  ASLogInfo(@"Current song updated to \"%@\".", _currentSong);
+}
+
 - (BOOL)start
 {
   if (_started) return NO;
@@ -333,10 +343,10 @@
 
 - (BOOL)duration:(double *)ret
 {
-  if ([self audioDataByteTotal] == 0) return NO;
-
   if (![_fileStreamHandler duration:ret])
   {
+    if ([self audioDataByteTotal] == 0) return NO;
+
     double calcBitrate;
     if (![self calculatedBitRate:&calcBitrate]) return NO;
     if (calcBitrate == 0.0) return NO;
@@ -431,6 +441,18 @@
   _httpHeaders = httpHeaders;
 }
 
+- (void)readStreamDidUpdateCurrentSong:(NSString *)currentSong
+{
+  ASAudioQueueCallback callback = ^{
+    [self setCurrentSong:currentSong];
+  };
+
+  if (_audioQueueHandler == nil)
+    callback();
+  else
+    [_audioQueueHandler queueCallback:callback];
+}
+
 - (void)readStreamReadyToStartReading
 {
   _fileStreamHandler = [[_fileStreamHandlerClass alloc] initWithFileType:_fileType];
@@ -481,8 +503,7 @@
   {
     _audioQueueHandler = [[_audioQueueHandlerClass alloc] initWithStreamDescription:_streamDescription
                                                                         bufferCount:_bufferCount
-                                                                         packetSize:((packetSize > 0) ? packetSize : _bufferSize)
-                                                               packetSizeCalculated:(packetSize != 0)];
+                                                                         packetSize:((packetSize > 0) ? packetSize : _bufferSize)];
     [_audioQueueHandler setDelegate:self];
   }
 

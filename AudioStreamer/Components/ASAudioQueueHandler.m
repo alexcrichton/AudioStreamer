@@ -9,7 +9,7 @@
 #import "ASInternal.h"
 
 
-#define kDefaultNumAQBufsToStart 32
+#define kDefaultNumAQBufsToStart 8
 
 #define kBitRateEstimationMinPackets 50
 
@@ -70,7 +70,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
 - (instancetype)initWithStreamDescription:(AudioStreamBasicDescription)asbd
                               bufferCount:(UInt32)bufferCount
                                packetSize:(UInt32)packetSize
-                     packetSizeCalculated:(BOOL)calculated
 {
     if ((self = [super init]))
     {
@@ -94,7 +93,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
         _bufferCount = bufferCount;
         _bufferFillCountToStart = kDefaultNumAQBufsToStart; // Default
         _bufferSize = packetSize;
-        _defaultBufferSizeUsed = !calculated;
 
         // allocate audio queue buffers
         _buffers = malloc(_bufferCount * sizeof(buffer_t *));
@@ -121,6 +119,8 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
             if ([self checkStatusForError:osErr errorCode:ASAudioQueueBufferAllocationFailed])
                 return self;
         }
+
+        _callbackQueue = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -922,6 +922,11 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
     return 1;
 }
 
+- (void)queueCallback:(ASAudioQueueCallback)callback
+{
+    _callbackQueue[@(_audioPacketsReceived)] = callback;
+}
+
 //
 // enqueueBuffer
 //
@@ -1078,6 +1083,37 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
     /* Signal the buffer is no longer in use */
     _buffers[idx]->inuse = NO;
     _buffersUsed--;
+
+    if ([_callbackQueue count] > 0) {
+        UInt32 nextIdx = idx + 1;
+        if (nextIdx == _bufferCount) nextIdx = 0;
+        buffer_t *nextBuffer = _buffers[nextIdx];
+
+        NSArray<NSNumber *> *packetsToCheck = [[_callbackQueue allKeys] sortedArrayUsingSelector:@selector(compare:)];
+        for (NSNumber *metadataPacketNum in packetsToCheck) {
+            unsigned long metadataPacketIdx = [metadataPacketNum unsignedLongValue];
+            ASAudioQueueCallback callback = _callbackQueue[metadataPacketNum];
+
+            if (nextBuffer->packetStart >= metadataPacketIdx) {
+                [_callbackQueue removeObjectForKey:metadataPacketNum];
+                callback();
+            } else if ((nextBuffer->packetStart + nextBuffer->packetCount) >= metadataPacketIdx) {
+                UInt32 packetOffset = (UInt32)(metadataPacketIdx - nextBuffer->packetStart);
+                UInt64 framesToWait = _streamDescription.mFramesPerPacket * packetOffset;
+                if (framesToWait == 0 && _vbr) {
+                    for (UInt32 i = 0; i < packetOffset; i++) {
+                        framesToWait += nextBuffer->packetDescs[i].mVariableFramesInPacket;
+                    }
+                }
+                [_callbackQueue removeObjectForKey:metadataPacketNum];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(framesToWait / _streamDescription.mSampleRate * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    callback();
+                });
+            } else {
+                break;
+            }
+        }
+    }
     
     /* If we're done with the buffers because the stream is dying, then there's no
      * need to call more methods on it */
@@ -1097,24 +1133,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
     else if (_buffersUsed == 0 && ![self isDone] && ![self isWaiting])
     {
         [self pause];
-        
-        /* This can either fix or delay the problem
-         * If it cannot fix it, the network is simply too slow */
-        if (_defaultBufferSizeUsed && _bufferSize < 65536 && !_seeking)
-        {
-            _bufferSize = _bufferSize * 2;
-            for (UInt32 j = 0; j < _bufferCount; ++j)
-            {
-                AudioQueueFreeBuffer(_audioQueue, _buffers[j]->ref);
-            }
-            for (UInt32 i = 0; i < _bufferCount; ++i)
-            {
-                OSStatus osErr = AudioQueueAllocateBuffer(_audioQueue, _bufferSize, &(_buffers[i]->ref));
-                if ([self checkStatusForError:osErr errorCode:ASAudioQueueBufferAllocationFailed])
-                    return;
-            }
-        }
-        
         [self setState:ASAudioQueueWaitingForData];
     }
     /* If we just opened up a buffer so try to fill it with some cached

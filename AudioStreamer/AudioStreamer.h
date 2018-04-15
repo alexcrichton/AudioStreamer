@@ -33,6 +33,8 @@
 
 @class AudioStreamer;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The AudioStreamerDelegate protocol provides callbacks for events that may happen
  * during the stream. This replaces the former NSNotification system used in Matt
@@ -52,6 +54,7 @@
  * @see [AudioStreamer isWaiting]
  */
 - (void)streamerStatusDidChange:(AudioStreamer *)sender;
+
 /**
  * @brief Called when the stream has collected enough data to calculate the bitrate
  *
@@ -63,6 +66,14 @@
  * @see [AudioStreamer calculatedBitRate:]
  */
 - (void)streamerBitrateIsReady:(AudioStreamer *)sender;
+
+/**
+ * @brief Called when the stream's current song has changed
+ *
+ * @param sender The streamer that called this method
+ * @param currentSong The new current song. This may be nil when opening a new stream
+ */
+- (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(nullable NSString *)currentSong;
 
 @end
 
@@ -156,9 +167,9 @@
  */
 @interface AudioStreamer : NSObject
 {
-  ASCFReadStreamHandler *_readStreamHandler;
-  ASAudioFileStreamHandler *_fileStreamHandler;
-  ASAudioQueueHandler *_audioQueueHandler;
+  ASCFReadStreamHandler * _Nullable _readStreamHandler;
+  ASAudioFileStreamHandler * _Nullable _fileStreamHandler;
+  ASAudioQueueHandler * _Nullable _audioQueueHandler;
 
 	ASProxyInformation *_proxyInfo;
 
@@ -199,7 +210,7 @@
  *
  * @see AudioStreamerDelegate
  */
-@property (nonatomic, readwrite, weak) id <AudioStreamerDelegate> delegate;
+@property (nonatomic, readwrite, weak, nullable) id <AudioStreamerDelegate> delegate;
 
 /**
  * @brief Tests whether the stream is playing
@@ -279,14 +290,14 @@
  *
  * @see AudioStreamerErrorCode
  */
-@property (readonly) NSError *error;
+@property (readonly, nullable) NSError *error;
 
 /**
  * @brief Headers received from the remote source
  *
  * @details Used to determine file size, but other information may be useful as well
  */
-@property (readonly) NSDictionary *httpHeaders;
+@property (readonly, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 
 /**
  * @brief The remote resource that this stream is playing
@@ -315,7 +326,7 @@
  *
  * The current song field is sometimes used as the stream title on some ICY streams.
  */
-@property (readonly) NSString *currentSong;
+@property (readonly, nullable) NSString *currentSong;
 
 /**
  * @brief The number of audio buffers to have
@@ -455,7 +466,7 @@
  *
  * Default: nil
  */
-@property (readwrite, copy) ASLogHandler logHandler;
+@property (readwrite, copy, nullable) ASLogHandler logHandler;
 
 @property (readwrite) Class readStreamHandlerClass;
 @property (readwrite) Class fileStreamHandlerClass;
@@ -557,7 +568,7 @@
  * @return YES if the bit rate could be calculated with a high degree of
  *         certainty, or NO if it could not be.
  */
-- (BOOL)calculatedBitRate:(double *)ret;
+- (BOOL)calculatedBitRate:(nullable double *)ret;
 
 /**
  * @brief Attempt to set the volume on the audio queue
@@ -594,7 +605,7 @@
  * @return YES if the progress of the stream was determined, or NO if the
  *         progress could not be determined at this time
  */
-- (BOOL)progress:(double *)ret;
+- (BOOL)progress:(nullable double *)ret;
 
 /**
  * @brief Calculate the buffer progress into the stream, in seconds
@@ -608,7 +619,7 @@
  * @return YES if the buffer progress of the stream was determined, or NO if the buffer
  *         progress could not be determined at this time
  */
-- (BOOL)bufferProgress:(double *)ret;
+- (BOOL)bufferProgress:(nullable double *)ret;
 
 /**
  * @brief Fade in playback
@@ -633,3 +644,5 @@
 - (BOOL)fadeOutDuration:(float)duration;
 
 @end
+
+NS_ASSUME_NONNULL_END

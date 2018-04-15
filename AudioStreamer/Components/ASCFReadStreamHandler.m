@@ -76,8 +76,8 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
     _icyMetaBytesRemaining = 0;
     _icyDataBytesRead = 0;
     _icyHeadersParsed = NO;
-    _icyMetadata = [NSMutableString string];
-    _currentSong = nil;
+    _icyMetadata = nil;
+    [self setCurrentSong:nil];
 
     _byteOffset = byteOffset;
     if (_byteOffset > 0)
@@ -249,6 +249,12 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
         case ASReadStreamTimedOut:
             return @"Timed out";
     }
+}
+
+- (void)setCurrentSong:(NSString *)currentSong
+{
+    _currentSong = currentSong;
+    [[self delegate] readStreamDidUpdateCurrentSong:currentSong];
 }
 
 //
@@ -487,9 +493,8 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
                             NSUInteger scanLoc = [scanner scanLocation];
                             NSString *value = [metadataLine substringWithRange:NSMakeRange(scanLoc, [metadataLine length] - scanLoc - 1)];
 
-                            ASLogInfo(@"ICY stream title (current song): %@", value);
-
-                            _currentSong = value;
+                            ASLogInfo(@"ICY stream title read: %@", value);
+                            [self setCurrentSong:value];
                         }
                         _icyDataBytesRead = 0;
                     }
@@ -771,11 +776,11 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
             }
             
             if (id3Title && id3Artist) {
-                _currentSong = [NSString stringWithFormat:@"%@ - %@", id3Artist, id3Title];
+                [self setCurrentSong:[NSString stringWithFormat:@"%@ - %@", id3Artist, id3Title]];
             } else if (id3Title) {
-                _currentSong = [NSString stringWithFormat:@"Unknown Artist - %@", id3Title];
+                [self setCurrentSong:[NSString stringWithFormat:@"Unknown Artist - %@", id3Title]];
             } else if (id3Artist) {
-                _currentSong = [NSString stringWithFormat:@"%@ - Unknown Title", id3Artist];
+                [self setCurrentSong:[NSString stringWithFormat:@"%@ - Unknown Title", id3Artist]];
             }
             
             ASLogInfo(@"ID3 Current Song: %@", _currentSong);
