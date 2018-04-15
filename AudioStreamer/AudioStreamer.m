@@ -400,7 +400,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     seekPacket = (SInt64)((bitrate / 8.0) * newSeekTime);
   }
 
-  if (totalAudioPackets != 1000000 && (UInt64)(seekPacket + 5) >= totalAudioPackets) {
+  if (totalAudioPackets != 0 && (UInt64)(seekPacket + 5) >= totalAudioPackets) {
     // Too little data to play anything useful
     [self setState:AS_DONE];
     return YES;
@@ -743,8 +743,6 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 }
 
 - (BOOL)duration:(double *)ret {
-  if (fileLength == 0) return NO;
-
   double packetDuration = _streamDescription.mFramesPerPacket / _streamDescription.mSampleRate;
   if (packetDuration <= 0) return NO;
 
@@ -759,8 +757,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     packetCount = totalAudioPackets;
   }
 
-  if (packetCount == 1000000)
+  if (packetCount == 0)
   {
+    if (fileLength == 0) return NO;
+
     // Method three
     double calcBitrate;
     if (![self calculatedBitRate:&calcBitrate]) return NO;
@@ -2177,6 +2177,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
       }
       AudioFileStreamSeek(audioFileStream, 0, &byteOffset, &ioFlags);
       totalAudioPackets = (UInt64)current + 1;
+      if (totalAudioPackets == 1000000) totalAudioPackets = 0;
       seekByteOffset = (UInt64)byteOffset + dataOffset;
       [self closeReadStream];
       [self openReadStream];
