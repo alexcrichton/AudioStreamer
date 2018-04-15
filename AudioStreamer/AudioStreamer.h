@@ -556,7 +556,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @details Used to determine file size, but other information may be useful as well
  */
-@property (readonly, nullable) NSDictionary *httpHeaders;
+@property (readonly, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 
 /**
  * @brief The remote resource that this stream is playing
