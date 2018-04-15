@@ -441,13 +441,13 @@
   _httpHeaders = httpHeaders;
 }
 
-- (void)readStreamDidUpdateCurrentSong:(NSString *)currentSong
+- (void)readStreamDidUpdateCurrentSong:(NSString *)currentSong shouldQueue:(BOOL)shouldQueue
 {
   ASAudioQueueCallback callback = ^{
     [self setCurrentSong:currentSong];
   };
 
-  if (_audioQueueHandler == nil)
+  if (_audioQueueHandler == nil || !shouldQueue)
     callback();
   else
     [_audioQueueHandler queueCallback:callback];

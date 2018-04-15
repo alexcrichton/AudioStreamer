@@ -71,7 +71,7 @@ extern NSString * const ASReadStreamErrorDomain;
 
 - (void)readStreamFileTypeUpdated:(AudioFileTypeID)fileType;
 - (void)readStreamReadHTTPHeaders:(NSDictionary *)httpHeaders;
-- (void)readStreamDidUpdateCurrentSong:(NSString *)currentSong;
+- (void)readStreamDidUpdateCurrentSong:(NSString *)currentSong shouldQueue:(BOOL)shouldQueue;
 
 - (void)readStreamReadyToStartReading;
 - (void)readStreamReadBytes:(UInt8 *)bytes length:(CFIndex)length;

@@ -254,7 +254,7 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
 - (void)setCurrentSong:(NSString *)currentSong
 {
     _currentSong = currentSong;
-    [[self delegate] readStreamDidUpdateCurrentSong:currentSong];
+    [[self delegate] readStreamDidUpdateCurrentSong:currentSong shouldQueue:(_icyDataBytesRead > 0)];
 }
 
 //
@@ -782,8 +782,9 @@ static void ASReadStreamCallback(CFReadStreamRef aStream, CFStreamEventType even
             } else if (id3Artist) {
                 [self setCurrentSong:[NSString stringWithFormat:@"%@ - Unknown Title", id3Artist]];
             }
-            
-            ASLogInfo(@"ID3 Current Song: %@", _currentSong);
+
+            if (_currentSong != nil)
+                ASLogInfo(@"ID3 Current Song: %@", _currentSong);
             
             _id3ParserState = ASID3StateParsed;
             break;
