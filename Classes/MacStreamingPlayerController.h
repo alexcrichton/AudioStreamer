@@ -26,7 +26,7 @@
 #import "AudioStreamer.h"
 #import "NSBufferSlider.h"
 
-@interface MacStreamingPlayerController : NSObject <AudioStreamerDelegate, NSTextFieldDelegate, CAAnimationDelegate>
+@interface MacStreamingPlayerController : NSObject <AudioStreamerDelegate, NSWindowDelegate, NSTextFieldDelegate, CAAnimationDelegate>
 {
     IBOutlet NSWindow *window;
 	IBOutlet NSTextField *downloadSourceField;

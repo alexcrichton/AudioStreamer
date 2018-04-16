@@ -28,11 +28,13 @@
 - (void)awakeFromNib
 {
 	[NSApp activateIgnoringOtherApps:YES];
-	NSRect frame = [window frame];
-	frame.size.height = 159;
-	[window setMinSize:frame.size];
-	[window setMaxSize:frame.size];
-	[window setFrame:frame display:YES];
+	[self adjustWindowSize];
+	[window setDelegate:self];
+}
+
+- (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state
+{
+	[self adjustWindowSize];
 }
 
 //
@@ -288,19 +290,14 @@
 
 - (void)streamer:(AudioStreamer *)sender didUpdateCurrentSong:(NSString *)currentSong
 {
+	[streamInfoLabel setStringValue:currentSong ?: @""];
+	[self adjustWindowSize];
+}
+
+- (void)adjustWindowSize
+{
 	NSRect frame = [window frame];
-
-	if (currentSong != nil)
-	{
-		frame.size.height = 184;
-	}
-	else
-	{
-		currentSong = @"";
-		frame.size.height = 159;
-	}
-
-	[streamInfoLabel setStringValue:currentSong];
+	frame.size.height = ([[streamInfoLabel stringValue] length] > 0) ? 184 : 159;
 	[window setMinSize:frame.size];
 	[window setMaxSize:frame.size];
 	[window setFrame:frame display:YES];
