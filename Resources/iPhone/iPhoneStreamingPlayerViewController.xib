@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="iPhoneStreamingPlayerViewController">
@@ -38,9 +42,9 @@
                 </label>
                 <button opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                     <rect key="frame" x="128" y="95" width="64" height="64"/>
-                    <fontDescription key="fontDescription" name="Helvetica-Bold" family="Helvetica" pointSize="15"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                     <state key="normal" image="playbutton.png">
-                        <color key="titleColor" red="0.19607843" green="0.30980393000000001" blue="0.52156866000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleColor" red="0.19607843" green="0.30980393000000001" blue="0.52156866000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <state key="highlighted">
@@ -64,7 +68,7 @@
                 </label>
                 <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="infinite" placeholderIntrinsicHeight="55" translatesAutoresizingMaskIntoConstraints="NO" id="35" customClass="ASVolumeView">
                     <rect key="frame" x="20" y="385" width="280" height="55"/>
-                    <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
                 <slider opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="100" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="46" customClass="UIBufferSlider">
                     <rect key="frame" x="18" y="204" width="284" height="31"/>
@@ -109,7 +113,7 @@
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="0.85204082999999997" green="0.85204082999999997" blue="0.85204082999999997" alpha="1" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="0.85204082999999997" green="0.85204082999999997" blue="0.85204082999999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="26" firstAttribute="top" secondItem="fbt-5L-aZj" secondAttribute="bottom" constant="8" id="1IF-er-4Uu"/>
                 <constraint firstItem="26" firstAttribute="trailing" secondItem="fbt-5L-aZj" secondAttribute="trailing" id="2yP-VW-C1R"/>
