@@ -824,7 +824,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return YES if the bit rate could be calculated with a high degree of
  *         certainty, or NO if it could not be.
  */
-- (BOOL)calculatedBitRate:(nullable double *)ret;
+- (BOOL)calculatedBitRate:(out double *)ret;
 
 /**
  * @brief Attempt to set the volume on the audio queue
@@ -848,7 +848,7 @@ NS_ASSUME_NONNULL_BEGIN
  *         could not be determined. In the NO case, the contents of ret are
  *         undefined
  */
-- (BOOL)duration:(nullable double *)ret;
+- (BOOL)duration:(out double *)ret;
 
 /**
  * @brief Calculate the progress into the stream, in seconds
@@ -861,7 +861,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return YES if the progress of the stream was determined, or NO if the
  *         progress could not be determined at this time
  */
-- (BOOL)progress:(nullable double *)ret;
+- (BOOL)progress:(out double *)ret;
 
 /**
  * @brief Calculate the buffer progress into the stream, in seconds
@@ -875,7 +875,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return YES if the buffer progress of the stream was determined, or NO if the buffer
  *         progress could not be determined at this time
  */
-- (BOOL)bufferProgress:(nullable double *)ret;
+- (BOOL)bufferProgress:(out double *)ret;
 
 /**
  * @brief Fade in playback
