@@ -357,7 +357,7 @@
 //
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector
 {
-	if ([NSStringFromSelector(commandSelector) isEqualToString:@"insertNewline:"])
+	if (commandSelector == @selector(insertNewline:))
 	{
 		[window makeFirstResponder:nil];
 		[self createStreamer];
