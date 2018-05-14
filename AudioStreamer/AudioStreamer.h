@@ -588,6 +588,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSString *currentSong;
 
 /**
+ * @brief  enable metering in order to access the peak and average power levels
+ *
+ * @details This must be set to YES prior to accessing the peak or average power levels.
+ *
+ * By default this is NO.
+ *
+ */
+@property (nonatomic, readwrite) BOOL meteringEnabled;
+
+/**
  * @brief The number of audio buffers to have
  *
  * @details Each audio buffer contains one or more packets of audio data. This amount is
@@ -836,6 +846,28 @@ NS_ASSUME_NONNULL_BEGIN
  *         internally to have a stream, then setVolume: will work
  */
 - (BOOL)setVolume:(float)volume;
+
+/**
+ * @brief Peak power level
+ *
+ * @details Accesses the peak power level of the audio stream if metering is enabled.
+ *
+ *@param ret The variable to fill in with the peak power level of the stream on success
+ *@return YES if ret contains the peak power level of the stream, or NO if the peak power level
+ *        could not be determined.
+ */
+- (BOOL)peakPower:(out Float32 *)ret;
+
+/**
+ * @brief Average power level
+ *
+ * @details Accesses the average power level of the audio stream if metering is enabled.
+ *
+ *@param ret The variable to fill in with the average power level of the stream on success
+ *@return YES if ret contains the average power level of the stream, or NO if the average power level
+ *        could not be determined.
+ */
+- (BOOL)averagePower:(out Float32 *)ret;
 
 /**
  * @brief Calculates the duration of the audio stream, in seconds
