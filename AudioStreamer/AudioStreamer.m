@@ -650,6 +650,14 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   return NO;
 }
 
+- (void)setMeteringEnabled:(BOOL)meteringEnabled {
+  _meteringEnabled = meteringEnabled;
+  if (audioQueue != nil) {
+    UInt32 enabledLevelMeter = (UInt32)self.meteringEnabled;
+    AudioQueueSetProperty(audioQueue, kAudioQueueProperty_EnableLevelMetering, &enabledLevelMeter, sizeof(UInt32));
+  }
+}
+
 - (BOOL)progress:(double *)ret {
   double sampleRate = _streamDescription.mSampleRate;
   if (state_ == AS_STOPPED) {
@@ -740,6 +748,30 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
     bitrateEstimated = false;
     return YES;
   }
+}
+
+- (BOOL)peakPower:(out Float32 *)ret {
+  if (self.meteringEnabled) {
+    AudioQueueLevelMeterState levelMeter;
+    UInt32 levelMeterSize = sizeof(AudioQueueLevelMeterState);
+    AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    *ret = levelMeter.mPeakPower;
+    return YES;
+  }
+  
+  return NO;
+}
+
+-(BOOL)averagePower:(out Float32 *)ret {
+  if (self.meteringEnabled) {
+    AudioQueueLevelMeterState levelMeter;
+    UInt32 levelMeterSize = sizeof(AudioQueueLevelMeterState);
+    AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    *ret = levelMeter.mAveragePower;
+    return YES;
+  }
+  
+  return NO;
 }
 
 - (BOOL)duration:(double *)ret {
@@ -1920,6 +1952,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
                                        (__bridge void*) self, CFRunLoopGetMain(), NULL,
                                        0, &audioQueue);
   CHECK_ERR(osErr, AS_AUDIO_QUEUE_CREATION_FAILED, [[self class] descriptionForAQErrorCode:osErr]);
+  
+  // enable metering
+  UInt32 enabledLevelMeter = (UInt32)self.meteringEnabled;
+  AudioQueueSetProperty(audioQueue, kAudioQueueProperty_EnableLevelMetering, &enabledLevelMeter, sizeof(UInt32));
 
   // start the queue if it has not been started already
   // listen to the "isRunning" property
