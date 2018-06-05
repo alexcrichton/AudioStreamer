@@ -754,7 +754,9 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   if (self.meteringEnabled) {
     AudioQueueLevelMeterState levelMeter;
     UInt32 levelMeterSize = sizeof(AudioQueueLevelMeterState);
-    AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    OSStatus status = AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    if (status != 0)
+      return NO;
     *ret = levelMeter.mPeakPower;
     return YES;
   }
@@ -766,7 +768,9 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
   if (self.meteringEnabled) {
     AudioQueueLevelMeterState levelMeter;
     UInt32 levelMeterSize = sizeof(AudioQueueLevelMeterState);
-    AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    OSStatus status = AudioQueueGetProperty(audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levelMeter, &levelMeterSize);
+    if (status != 0)
+      return NO;
     *ret = levelMeter.mAveragePower;
     return YES;
   }
