@@ -61,6 +61,13 @@
 			remoteGlobalIDString = 97B9CFE0158AD09B0085BC63;
 			remoteInfo = AudioStreamer;
 		};
+		C02CD7BF20C6C2B700DFA7BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 973BB664158AD07000A7D459 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4965F2D81824D40700EF8875;
+			remoteInfo = libAudioStreamer;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -391,6 +398,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C02CD7C020C6C2B700DFA7BB /* PBXTargetDependency */,
 			);
 			name = "iPhone Streaming Player";
 			productName = "iPhone Streaming Player";
@@ -520,6 +528,11 @@
 			isa = PBXTargetDependency;
 			target = 97B9CFE0158AD09B0085BC63 /* AudioStreamer */;
 			targetProxy = 97B9D040158AD5A50085BC63 /* PBXContainerItemProxy */;
+		};
+		C02CD7C020C6C2B700DFA7BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4965F2D81824D40700EF8875 /* libAudioStreamer */;
+			targetProxy = C02CD7BF20C6C2B700DFA7BB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

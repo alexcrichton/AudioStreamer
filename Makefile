@@ -12,13 +12,23 @@ framework:
 mac:
 	$(XCB) $(XCBFLAGS) -target 'Mac Streaming Player'
 
+iphonesimulatorlib: XCBFLAGS += -sdk iphonesimulator
+iphonesimulatorlib:
+	$(XCB) $(XCBFLAGS) -target 'libAudioStreamer'
 iphonelib: XCBFLAGS += -sdk iphoneos
 iphonelib:
 	$(XCB) $(XCBFLAGS) -target 'libAudioStreamer'
 
+iphonesimulator: XCBFLAGS += -sdk iphonesimulator
+iphonesimulator:
+	$(XCB) $(XCBFLAGS) -target 'iPhone Streaming Player'
 iphone: XCBFLAGS += -sdk iphoneos
 iphone:
 	$(XCB) $(XCBFLAGS) -target 'iPhone Streaming Player'
+
+iossimulatorlib: iphonesimulatorlib
+ioslib: iphonelib
+iossimulator: iphonesimulator
 ios: iphone
 
 dochtml:
