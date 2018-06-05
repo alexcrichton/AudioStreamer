@@ -588,12 +588,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSString *currentSong;
 
 /**
- * @brief  enable metering in order to access the peak and average power levels
+ * @brief Enable metering in order to access the peak and average power levels
  *
  * @details This must be set to YES prior to accessing the peak or average power levels.
  *
  * By default this is NO.
- *
  */
 @property (nonatomic, readwrite) BOOL meteringEnabled;
 
@@ -848,24 +847,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)setVolume:(float)volume;
 
 /**
- * @brief Peak power level
+ * @brief Gets the peak power level
  *
- * @details Accesses the peak power level of the audio stream if metering is enabled.
+ * @details Accesses the peak RMS power level (on a scale of 0 to 1) of the audio stream
+ * if metering is enabled.
  *
- *@param ret The variable to fill in with the peak power level of the stream on success
- *@return YES if ret contains the peak power level of the stream, or NO if the peak power level
- *        could not be determined.
+ * @param ret The variable to fill in with the peak power level of the stream on success
+ * @return YES if ret contains the peak power level of the stream, or NO if the peak power
+ *         level could not be determined or metering is not enabled.
+ *
+ * @see [AudioStreamer meteringEnabled]
  */
 - (BOOL)peakPower:(out Float32 *)ret;
 
 /**
- * @brief Average power level
+ * @brief Gets the average power level
  *
- * @details Accesses the average power level of the audio stream if metering is enabled.
+ * @details Accesses the average RMS power level (on a scale of 0 to 1) of the audio stream
+ * if metering is enabled.
  *
- *@param ret The variable to fill in with the average power level of the stream on success
- *@return YES if ret contains the average power level of the stream, or NO if the average power level
- *        could not be determined.
+ * @param ret The variable to fill in with the average power level of the stream on success
+ * @return YES if ret contains the average power level of the stream, or NO if the average
+ *         power level could not be determined or metering is not enabled.
+ *
+ * @see [AudioStreamer meteringEnabled]
  */
 - (BOOL)averagePower:(out Float32 *)ret;
 
