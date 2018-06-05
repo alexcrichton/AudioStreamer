@@ -1,0 +1,5 @@
+language: objective-c
+osx_image: xcode9.3
+script:
+  - make mac
+  - make ios

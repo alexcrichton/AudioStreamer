@@ -19,6 +19,7 @@ iphonelib:
 iphone: XCBFLAGS += -sdk iphoneos
 iphone:
 	$(XCB) $(XCBFLAGS) -target 'iPhone Streaming Player'
+ios: iphone
 
 dochtml:
 	appledoc --project-name AudioStreamer --project-company ' ' \
