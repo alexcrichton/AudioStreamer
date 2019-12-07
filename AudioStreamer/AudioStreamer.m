@@ -1478,7 +1478,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
               }
 
               if (_fileType != oldFileType) {
-                LOG_INFO(@"ICY stream Content-Type: %@", lineItems[1]);
+                LOG_INFO(@"ICY: Stream Content-Type: %@", lineItems[1]);
                 AudioFileStreamClose(audioFileStream);
                 AudioQueueStop(audioQueue, true);
                 if (buffers) {
@@ -1536,7 +1536,7 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
               NSUInteger scanLoc = [scanner scanLocation];
               NSString *value = [metadataLine substringWithRange:NSMakeRange(scanLoc, [metadataLine length] - scanLoc - 1)];
 
-              LOG_INFO(@"ICY stream title read: %@", value);
+              LOG_DEBUG(@"ICY: Stream title read: %@", value);
               icyMetadataQueue[@(audioPacketsReceived)] = value;
               LOG_DEBUG(@"ICY: Current song update queued for packet %llu.", audioPacketsReceived);
             }
@@ -1840,8 +1840,6 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
         [self setCurrentSong:[NSString stringWithFormat:@"%@ - Unknown Title", id3Artist]];
       }
 
-      LOG_INFO(@"ID3 Current Song: %@", _currentSong);
-
       id3ParserState = ID3_STATE_PARSED;
       break;
     } else {
@@ -1851,18 +1849,19 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
 }
 
 - (void)setCurrentSong:(NSString *)currentSong {
+  if ([currentSong isEqualToString:_currentSong]) return;
   _currentSong = currentSong;
   __strong id <AudioStreamerDelegate> delegate = _delegate;
   if (delegate && [delegate respondsToSelector:@selector(streamer:didUpdateCurrentSong:)]) {
     [delegate streamer:self didUpdateCurrentSong:_currentSong];
   }
+  LOG_INFO(@"Current song updated to \"%@\".", _currentSong);
 }
 
 - (void)updateICYCurrentSong:(unsigned long)idx {
   if (icyMetadataQueue[@(idx)] == nil) return;
   [self setCurrentSong:icyMetadataQueue[@(idx)]];
   [icyMetadataQueue removeObjectForKey:@(idx)];
-  LOG_INFO(@"ICY: Current song updated to \"%@\".", _currentSong);
 }
 
 //
@@ -2477,8 +2476,10 @@ static void ASReadStreamCallBack(CFReadStreamRef aStream, CFStreamEventType even
             framesToWait += nextBuffer->packetDescs[i].mVariableFramesInPacket;
           }
         }
+        NSString *song = icyMetadataQueue[@(metadataPacketIdx)];
+        [icyMetadataQueue removeObjectForKey:@(metadataPacketIdx)];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(framesToWait / _streamDescription.mSampleRate * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-          [self updateICYCurrentSong:metadataPacketIdx];
+          [self setCurrentSong:song];
         });
       } else {
         break;
